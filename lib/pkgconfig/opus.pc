@@ -1,0 +1,16 @@
+# Opus codec reference implementation pkg-config file
+
+prefix=C:/Opus
+exec_prefix=C:/Opus
+libdir=C:/Opus/lib
+includedir=C:/Opus/include
+
+Name: Opus
+Description: Opus IETF audio codec ( build)
+URL: https://opus-codec.org/
+Version: 1.5.2
+Requires:
+Conflicts:
+Libs: -LC:/Opus/lib -lopus
+Libs.private: 
+Cflags: -IC:/Opus/include/opus
