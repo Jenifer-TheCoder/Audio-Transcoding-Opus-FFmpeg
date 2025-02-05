@@ -18,14 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file audio transcoding to Given option API usage example
- * @example transcode_aac.c
- *
- * Convert an input audio file to AAC in an MP4 container. Formats other than
- * MP4 are supported based on the output file extension.
- * @author Andreas Unterweger (dustsigns@gmail.com)
- */
+ /**
+  * @file audio transcoding to Given option API usage example
+  * @example transcode_aac.c
+  *
+  * Convert an input audio file to AAC in an MP4 container. Formats other than
+  * MP4 are supported based on the output file extension.
+  * @author Andreas Unterweger (dustsigns@gmail.com)
+  */
 
 #include <stdio.h>
 
@@ -44,7 +44,7 @@
 
 #include <libswresample/swresample.h>
 
-/* The output bit rate in bit/s */
+  /* The output bit rate in bit/s */
 #define OUTPUT_BIT_RATE 96000
 /* The number of output channels */
 #define OUTPUT_CHANNELS 2
@@ -76,20 +76,20 @@ int find_nearest_opus_sample_rate(int sample_rate) {
  * @param[out] input_codec_context  Codec context of opened file
  * @return Error code (0 if successful)
  */
-static int open_input_file(const char *filename,
-                           AVFormatContext **input_format_context,
-                           AVCodecContext **input_codec_context)
+static int open_input_file(const char* filename,
+    AVFormatContext** input_format_context,
+    AVCodecContext** input_codec_context)
 {
-    AVCodecContext *avctx;
-    const AVCodec *input_codec;
-    const AVStream *stream;
+    AVCodecContext* avctx;
+    const AVCodec* input_codec;
+    const AVStream* stream;
     int error;
 
     /* Open the input file to read from it. */
     if ((error = avformat_open_input(input_format_context, filename, NULL,
-                                     NULL)) < 0) {
+        NULL)) < 0) {
         fprintf(stderr, "Could not open input file '%s' (error '%s')\n",
-                filename, av_err2str(error));
+            filename, av_err2str(error));
         *input_format_context = NULL;
         return error;
     }
@@ -97,7 +97,7 @@ static int open_input_file(const char *filename,
     /* Get information on the input file (number of streams etc.). */
     if ((error = avformat_find_stream_info(*input_format_context, NULL)) < 0) {
         fprintf(stderr, "Could not open find stream info (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         avformat_close_input(input_format_context);
         return error;
     }
@@ -163,7 +163,7 @@ static int open_input_file(const char *filename,
     /* Open the decoder for the audio stream to use it later. */
     if ((error = avcodec_open2(avctx, input_codec, NULL)) < 0) {
         fprintf(stderr, "Could not open input codec (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         avcodec_free_context(&avctx);
         avformat_close_input(input_format_context);
         return error;
@@ -188,22 +188,22 @@ static int open_input_file(const char *filename,
  * @param[out] output_codec_context  Codec context of output file
  * @return Error code (0 if successful)
  */
-static int open_output_file(const char *filename,
-                            AVCodecContext *input_codec_context,
-                            AVFormatContext **output_format_context,
-                            AVCodecContext **output_codec_context)
+static int open_output_file(const char* filename,
+    AVCodecContext* input_codec_context,
+    AVFormatContext** output_format_context,
+    AVCodecContext** output_codec_context)
 {
-    AVCodecContext *avctx          = NULL;
-    AVIOContext *output_io_context = NULL;
-    AVStream *stream               = NULL;
-    const AVCodec *output_codec    = NULL;
+    AVCodecContext* avctx = NULL;
+    AVIOContext* output_io_context = NULL;
+    AVStream* stream = NULL;
+    const AVCodec* output_codec = NULL;
     int error;
 
     /* Open the output file to write to it. */
     if ((error = avio_open(&output_io_context, filename,
-                           AVIO_FLAG_WRITE)) < 0) {
+        AVIO_FLAG_WRITE)) < 0) {
         fprintf(stderr, "Could not open output file '%s' (error '%s')\n",
-                filename, av_err2str(error));
+            filename, av_err2str(error));
         return error;
     }
 
@@ -218,7 +218,7 @@ static int open_output_file(const char *filename,
 
     /* Guess the desired container format based on the file extension. */
     if (!((*output_format_context)->oformat = av_guess_format(NULL, filename,
-                                                              NULL))) {
+        NULL))) {
         fprintf(stderr, "Could not find output file format\n");
         goto cleanup;
     }
@@ -258,7 +258,7 @@ static int open_output_file(const char *filename,
     av_channel_layout_default(&avctx->ch_layout, OUTPUT_CHANNELS);
     avctx->sample_rate = find_nearest_opus_sample_rate(input_codec_context->sample_rate);
     avctx->sample_fmt = (ret >= 0 && sample_fmts[0]);// output_codec->sample_fmts[0];
-    avctx->bit_rate       = OUTPUT_BIT_RATE;
+    avctx->bit_rate = OUTPUT_BIT_RATE;
 
     /* Set the sample rate for the container. */
     stream->time_base.den = avctx->sample_rate;
@@ -272,7 +272,7 @@ static int open_output_file(const char *filename,
     /* Open the encoder for the audio stream to use it later. */
     if ((error = avcodec_open2(avctx, output_codec, NULL)) < 0) {
         fprintf(stderr, "Could not open output codec (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         goto cleanup;
     }
 
@@ -306,7 +306,7 @@ cleanup:
  * @param[out] packet Packet to be initialized
  * @return Error code (0 if successful)
  */
-static int init_packet(AVPacket **packet)
+static int init_packet(AVPacket** packet)
 {
     if (!(*packet = av_packet_alloc())) {
         fprintf(stderr, "Could not allocate packet\n");
@@ -320,7 +320,7 @@ static int init_packet(AVPacket **packet)
  * @param[out] frame Frame to be initialized
  * @return Error code (0 if successful)
  */
-static int init_input_frame(AVFrame **frame)
+static int init_input_frame(AVFrame** frame)
 {
     if (!(*frame = av_frame_alloc())) {
         fprintf(stderr, "Could not allocate input frame\n");
@@ -338,41 +338,41 @@ static int init_input_frame(AVFrame **frame)
  * @param[out] resample_context     Resample context for the required conversion
  * @return Error code (0 if successful)
  */
-static int init_resampler(AVCodecContext *input_codec_context,
-                          AVCodecContext *output_codec_context,
-                          SwrContext **resample_context)
+static int init_resampler(AVCodecContext* input_codec_context,
+    AVCodecContext* output_codec_context,
+    SwrContext** resample_context)
 {
-        int error;
+    int error;
 
-        /*
-         * Create a resampler context for the conversion.
-         * Set the conversion parameters.
-         */
-        error = swr_alloc_set_opts2(resample_context,
-                                             &output_codec_context->ch_layout,
-                                              output_codec_context->sample_fmt,
-                                              output_codec_context->sample_rate,
-                                             &input_codec_context->ch_layout,
-                                              input_codec_context->sample_fmt,
-                                              input_codec_context->sample_rate,
-                                              0, NULL);
-        if (error < 0) {
-            fprintf(stderr, "Could not allocate resample context\n");
-            return error;
-        }
-        /*
-        * Perform a sanity check so that the number of converted samples is
-        * not greater than the number of samples to be converted.
-        * If the sample rates differ, this case has to be handled differently
-        */
-        //av_assert0(output_codec_context->sample_rate == input_codec_context->sample_rate);
+    /*
+     * Create a resampler context for the conversion.
+     * Set the conversion parameters.
+     */
+    error = swr_alloc_set_opts2(resample_context,
+        &output_codec_context->ch_layout,
+        output_codec_context->sample_fmt,
+        output_codec_context->sample_rate,
+        &input_codec_context->ch_layout,
+        input_codec_context->sample_fmt,
+        input_codec_context->sample_rate,
+        0, NULL);
+    if (error < 0) {
+        fprintf(stderr, "Could not allocate resample context\n");
+        return error;
+    }
+    /*
+    * Perform a sanity check so that the number of converted samples is
+    * not greater than the number of samples to be converted.
+    * If the sample rates differ, this case has to be handled differently
+    */
+    //av_assert0(output_codec_context->sample_rate == input_codec_context->sample_rate);
 
-        /* Open the resampler with the specified parameters. */
-        if ((error = swr_init(*resample_context)) < 0) {
-            fprintf(stderr, "Could not open resample context\n");
-            swr_free(resample_context);
-            return error;
-        }
+    /* Open the resampler with the specified parameters. */
+    if ((error = swr_init(*resample_context)) < 0) {
+        fprintf(stderr, "Could not open resample context\n");
+        swr_free(resample_context);
+        return error;
+    }
     return 0;
 }
 
@@ -382,11 +382,11 @@ static int init_resampler(AVCodecContext *input_codec_context,
  * @param      output_codec_context Codec context of the output file
  * @return Error code (0 if successful)
  */
-static int init_fifo(AVAudioFifo **fifo, AVCodecContext *output_codec_context)
+static int init_fifo(AVAudioFifo** fifo, AVCodecContext* output_codec_context)
 {
     /* Create the FIFO buffer based on the specified output sample format. */
     if (!(*fifo = av_audio_fifo_alloc(output_codec_context->sample_fmt,
-                                      output_codec_context->ch_layout.nb_channels, 1))) {
+        output_codec_context->ch_layout.nb_channels, 1))) {
         fprintf(stderr, "Could not allocate FIFO\n");
         return AVERROR(ENOMEM);
     }
@@ -398,12 +398,12 @@ static int init_fifo(AVAudioFifo **fifo, AVCodecContext *output_codec_context)
  * @param output_format_context Format context of the output file
  * @return Error code (0 if successful)
  */
-static int write_output_file_header(AVFormatContext *output_format_context)
+static int write_output_file_header(AVFormatContext* output_format_context)
 {
     int error;
     if ((error = avformat_write_header(output_format_context, NULL)) < 0) {
         fprintf(stderr, "Could not write output file header (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         return error;
     }
     return 0;
@@ -422,13 +422,13 @@ static int write_output_file_header(AVFormatContext *output_format_context)
  *                                  function has to be called again.
  * @return Error code (0 if successful)
  */
-static int decode_audio_frame(AVFrame *frame,
-                              AVFormatContext *input_format_context,
-                              AVCodecContext *input_codec_context,
-                              int *data_present, int *finished)
+static int decode_audio_frame(AVFrame* frame,
+    AVFormatContext* input_format_context,
+    AVCodecContext* input_codec_context,
+    int* data_present, int* finished)
 {
     /* Packet used for temporary storage. */
-    AVPacket *input_packet;
+    AVPacket* input_packet;
     int error;
 
     error = init_packet(&input_packet);
@@ -444,7 +444,7 @@ static int decode_audio_frame(AVFrame *frame,
             *finished = 1;
         else {
             fprintf(stderr, "Could not read frame (error '%s')\n",
-                    av_err2str(error));
+                av_err2str(error));
             goto cleanup;
         }
     }
@@ -465,7 +465,7 @@ static int decode_audio_frame(AVFrame *frame,
      * The input audio stream decoder is used to do this. */
     if ((error = avcodec_send_packet(input_codec_context, input_packet)) < 0) {
         fprintf(stderr, "Could not send packet for decoding (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         goto cleanup;
     }
 
@@ -476,17 +476,20 @@ static int decode_audio_frame(AVFrame *frame,
     if (error == AVERROR(EAGAIN)) {
         error = 0;
         goto cleanup;
-    /* If the end of the input file is reached, stop decoding. */
-    } else if (error == AVERROR_EOF) {
+        /* If the end of the input file is reached, stop decoding. */
+    }
+    else if (error == AVERROR_EOF) {
         *finished = 1;
         error = 0;
         goto cleanup;
-    } else if (error < 0) {
+    }
+    else if (error < 0) {
         fprintf(stderr, "Could not decode frame (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         goto cleanup;
-    /* Default case: Return decoded data. */
-    } else {
+        /* Default case: Return decoded data. */
+    }
+    else {
         *data_present = 1;
         goto cleanup;
     }
@@ -508,9 +511,9 @@ cleanup:
  *                                     each round
  * @return Error code (0 if successful)
  */
-static int init_converted_samples(uint8_t ***converted_input_samples,
-                                  AVCodecContext *output_codec_context,
-                                  int frame_size)
+static int init_converted_samples(uint8_t*** converted_input_samples,
+    AVCodecContext* output_codec_context,
+    int frame_size)
 {
     int error;
 
@@ -520,12 +523,12 @@ static int init_converted_samples(uint8_t ***converted_input_samples,
      * Allocate memory for the samples of all channels in one consecutive
      * block for convenience. */
     if ((error = av_samples_alloc_array_and_samples(converted_input_samples, NULL,
-                                  output_codec_context->ch_layout.nb_channels,
-                                  frame_size,
-                                  output_codec_context->sample_fmt, 0)) < 0) {
+        output_codec_context->ch_layout.nb_channels,
+        frame_size,
+        output_codec_context->sample_fmt, 0)) < 0) {
         fprintf(stderr,
-                "Could not allocate converted input samples (error '%s')\n",
-                av_err2str(error));
+            "Could not allocate converted input samples (error '%s')\n",
+            av_err2str(error));
         return error;
     }
     return 0;
@@ -543,21 +546,20 @@ static int init_converted_samples(uint8_t ***converted_input_samples,
  * @param      resample_context Resample context for the conversion
  * @return Error code (0 if successful)
  */
-static int convert_samples(const uint8_t **input_data,
-                           uint8_t **converted_data, const int frame_size,
-                           SwrContext *resample_context)
+static int convert_samples(const uint8_t** input_data,
+    uint8_t** converted_data, const int frame_size,
+    SwrContext* resample_context)
 {
     int error;
 
     /* Convert the samples using the resampler. */
     if ((error = swr_convert(resample_context,
-                             converted_data, frame_size,
-                             input_data    , frame_size)) < 0) {
+        converted_data, frame_size,
+        input_data, frame_size)) < 0) {
         fprintf(stderr, "Could not convert input samples (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         return error;
     }
-    printf("Resampled %d samples to %d samples\n", frame_size, error);
 
     return 0;
 }
@@ -570,9 +572,9 @@ static int convert_samples(const uint8_t **input_data,
  * @param frame_size              Number of samples to be converted
  * @return Error code (0 if successful)
  */
-static int add_samples_to_fifo(AVAudioFifo *fifo,
-                               uint8_t **converted_input_samples,
-                               const int frame_size)
+static int add_samples_to_fifo(AVAudioFifo* fifo,
+    uint8_t** converted_input_samples,
+    const int frame_size)
 {
     int error;
 
@@ -584,8 +586,8 @@ static int add_samples_to_fifo(AVAudioFifo *fifo,
     }
 
     /* Store the new samples in the FIFO buffer. */
-    if (av_audio_fifo_write(fifo, (void **)converted_input_samples,
-                            frame_size) < frame_size) {
+    if (av_audio_fifo_write(fifo, (void**)converted_input_samples,
+        frame_size) < frame_size) {
         fprintf(stderr, "Could not write data to FIFO\n");
         return AVERROR_EXIT;
     }
@@ -608,17 +610,17 @@ static int add_samples_to_fifo(AVAudioFifo *fifo,
  *                                  again.
  * @return Error code (0 if successful)
  */
-static int read_decode_convert_and_store(AVAudioFifo *fifo,
-                                         AVFormatContext *input_format_context,
-                                         AVCodecContext *input_codec_context,
-                                         AVCodecContext *output_codec_context,
-                                         SwrContext *resampler_context,
-                                         int *finished)
+static int read_decode_convert_and_store(AVAudioFifo* fifo,
+    AVFormatContext* input_format_context,
+    AVCodecContext* input_codec_context,
+    AVCodecContext* output_codec_context,
+    SwrContext* resampler_context,
+    int* finished)
 {
     /* Temporary storage of the input samples of the frame read from the file. */
-    AVFrame *input_frame = NULL;
+    AVFrame* input_frame = NULL;
     /* Temporary storage for the converted input samples. */
-    uint8_t **converted_input_samples = NULL;
+    uint8_t** converted_input_samples = NULL;
     int data_present;
     int ret = AVERROR_EXIT;
 
@@ -627,7 +629,7 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
         goto cleanup;
     /* Decode one frame worth of audio samples. */
     if (decode_audio_frame(input_frame, input_format_context,
-                           input_codec_context, &data_present, finished))
+        input_codec_context, &data_present, finished))
         goto cleanup;
     /* If we are at the end of the file and there are no more samples
      * in the decoder which are delayed, we are actually finished.
@@ -640,18 +642,18 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
     if (data_present) {
         /* Initialize the temporary storage for the converted input samples. */
         if (init_converted_samples(&converted_input_samples, output_codec_context,
-                                   input_frame->nb_samples))
+            input_frame->nb_samples))
             goto cleanup;
 
         /* Convert the input samples to the desired output sample format.
          * This requires a temporary storage provided by converted_input_samples. */
         if (convert_samples((const uint8_t**)input_frame->extended_data, converted_input_samples,
-                            input_frame->nb_samples, resampler_context))
+            input_frame->nb_samples, resampler_context))
             goto cleanup;
 
         /* Add the converted input samples to the FIFO buffer for later processing. */
         if (add_samples_to_fifo(fifo, converted_input_samples,
-                                input_frame->nb_samples))
+            input_frame->nb_samples))
             goto cleanup;
         ret = 0;
     }
@@ -674,9 +676,9 @@ cleanup:
  * @param      frame_size           Size of the frame
  * @return Error code (0 if successful)
  */
-static int init_output_frame(AVFrame **frame,
-                             AVCodecContext *output_codec_context,
-                             int frame_size)
+static int init_output_frame(AVFrame** frame,
+    AVCodecContext* output_codec_context,
+    int frame_size)
 {
     int error;
 
@@ -691,16 +693,16 @@ static int init_output_frame(AVFrame **frame,
      * audio samples of the frame.
      * Default channel layouts based on the number of channels
      * are assumed for simplicity. */
-    (*frame)->nb_samples     = frame_size;
+    (*frame)->nb_samples = frame_size;
     av_channel_layout_copy(&(*frame)->ch_layout, &output_codec_context->ch_layout);
-    (*frame)->format         = output_codec_context->sample_fmt;
-    (*frame)->sample_rate    = output_codec_context->sample_rate;
+    (*frame)->format = output_codec_context->sample_fmt;
+    (*frame)->sample_rate = output_codec_context->sample_rate;
 
     /* Allocate the samples of the created frame. This call will make
      * sure that the audio frame can hold as many samples as specified. */
     if ((error = av_frame_get_buffer(*frame, 0)) < 0) {
         fprintf(stderr, "Could not allocate output frame samples (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         av_frame_free(frame);
         return error;
     }
@@ -720,13 +722,13 @@ static int64_t pts = 0;
  *                                   encoded
  * @return Error code (0 if successful)
  */
-static int encode_audio_frame(AVFrame *frame,
-                              AVFormatContext *output_format_context,
-                              AVCodecContext *output_codec_context,
-                              int *data_present)
+static int encode_audio_frame(AVFrame* frame,
+    AVFormatContext* output_format_context,
+    AVCodecContext* output_codec_context,
+    int* data_present)
 {
     /* Packet used for temporary storage. */
-    AVPacket *output_packet;
+    AVPacket* output_packet;
     int error;
 
     error = init_packet(&output_packet);
@@ -736,7 +738,6 @@ static int encode_audio_frame(AVFrame *frame,
     /* Set a timestamp based on the sample rate for the container. */
     if (frame) {
         frame->pts = pts;// av_rescale_q(pts, output_codec_context->time_base, output_format_context->streams[1]->time_base);
-        printf("Encoding frame with pts = %" PRId64 "\n", frame->pts);
         pts += frame->nb_samples;
     }
 
@@ -747,9 +748,9 @@ static int encode_audio_frame(AVFrame *frame,
     /* Check for errors, but proceed with fetching encoded samples if the
      *  encoder signals that it has nothing more to encode. */
     if (error < 0 && error != AVERROR_EOF) {
-      fprintf(stderr, "Could not send packet for encoding (error '%s')\n",
-              av_err2str(error));
-      goto cleanup;
+        fprintf(stderr, "Could not send packet for encoding (error '%s')\n",
+            av_err2str(error));
+        goto cleanup;
     }
 
     /* Receive one encoded frame from the encoder. */
@@ -759,16 +760,19 @@ static int encode_audio_frame(AVFrame *frame,
     if (error == AVERROR(EAGAIN)) {
         error = 0;
         goto cleanup;
-    /* If the last frame has been encoded, stop encoding. */
-    } else if (error == AVERROR_EOF) {
+        /* If the last frame has been encoded, stop encoding. */
+    }
+    else if (error == AVERROR_EOF) {
         error = 0;
         goto cleanup;
-    } else if (error < 0) {
+    }
+    else if (error < 0) {
         fprintf(stderr, "Could not encode frame (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         goto cleanup;
-    /* Default case: Return encoded data. */
-    } else {
+        /* Default case: Return encoded data. */
+    }
+    else {
         *data_present = 1;
     }
 
@@ -776,7 +780,6 @@ static int encode_audio_frame(AVFrame *frame,
     if (*data_present) {
         output_packet->stream_index = output_format_context->streams[0]->index;
         av_packet_rescale_ts(output_packet, output_codec_context->time_base, output_format_context->streams[output_packet->stream_index]->time_base);
-        printf("Writing packet with pts = %" PRId64 "\n", output_packet->pts);
         if ((error = av_interleaved_write_frame(output_format_context, output_packet)) < 0) {
             fprintf(stderr, "Could not write frame (error '%s')\n",
                 av_err2str(error));
@@ -797,19 +800,18 @@ cleanup:
  * @param output_codec_context  Codec context of the output file
  * @return Error code (0 if successful)
  */
-static int load_encode_and_write(AVAudioFifo *fifo,
-                                 AVFormatContext *output_format_context,
-                                 AVCodecContext *output_codec_context)
+static int load_encode_and_write(AVAudioFifo* fifo,
+    AVFormatContext* output_format_context,
+    AVCodecContext* output_codec_context)
 {
     /* Temporary storage of the output samples of the frame written to the file. */
-    AVFrame *output_frame;
+    AVFrame* output_frame;
     /* Use the maximum number of possible samples per frame.
      * If there is less than the maximum possible frame size in the FIFO
      * buffer use this number. Otherwise, use the maximum possible frame size. */
     const int frame_size = FFMIN(av_audio_fifo_size(fifo),
-                                 output_codec_context->frame_size);
+        output_codec_context->frame_size);
     int data_written;
-    printf("FIFO size: %d, frame_size: %d\n", av_audio_fifo_size(fifo), frame_size);
 
     /* Initialize temporary storage for one output frame. */
     if (init_output_frame(&output_frame, output_codec_context, frame_size))
@@ -817,7 +819,7 @@ static int load_encode_and_write(AVAudioFifo *fifo,
 
     /* Read as many samples from the FIFO buffer as required to fill the frame.
      * The samples are stored in the frame temporarily. */
-    if (av_audio_fifo_read(fifo, (void **)output_frame->data, frame_size) < frame_size) {
+    if (av_audio_fifo_read(fifo, (void**)output_frame->data, frame_size) < frame_size) {
         fprintf(stderr, "Could not read data from FIFO\n");
         av_frame_free(&output_frame);
         return AVERROR_EXIT;
@@ -825,7 +827,7 @@ static int load_encode_and_write(AVAudioFifo *fifo,
 
     /* Encode one frame worth of audio samples. */
     if (encode_audio_frame(output_frame, output_format_context,
-                           output_codec_context, &data_written)) {
+        output_codec_context, &data_written)) {
         av_frame_free(&output_frame);
         return AVERROR_EXIT;
     }
@@ -838,41 +840,41 @@ static int load_encode_and_write(AVAudioFifo *fifo,
  * @param output_format_context Format context of the output file
  * @return Error code (0 if successful)
  */
-static int write_output_file_trailer(AVFormatContext *output_format_context)
+static int write_output_file_trailer(AVFormatContext* output_format_context)
 {
     int error;
     if ((error = av_write_trailer(output_format_context)) < 0) {
         fprintf(stderr, "Could not write output file trailer (error '%s')\n",
-                av_err2str(error));
+            av_err2str(error));
         return error;
     }
     return 0;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    AVFormatContext *input_format_context = NULL, *output_format_context = NULL;
-    AVCodecContext *input_codec_context = NULL, *output_codec_context = NULL;
-    SwrContext *resample_context = NULL;
-    AVAudioFifo *fifo = NULL;
+    AVFormatContext* input_format_context = NULL, * output_format_context = NULL;
+    AVCodecContext* input_codec_context = NULL, * output_codec_context = NULL;
+    SwrContext* resample_context = NULL;
+    AVAudioFifo* fifo = NULL;
     int ret = AVERROR_EXIT;
 
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <input file> <output file>\n", argv[0]);
         exit(1);
     }
-    
+
     /* Open the input file for reading. */
     if (open_input_file(argv[1], &input_format_context,
-                        &input_codec_context))
+        &input_codec_context))
         goto cleanup;
     /* Open the output file for writing. */
     if (open_output_file(argv[2], input_codec_context,
-                         &output_format_context, &output_codec_context))
+        &output_format_context, &output_codec_context))
         goto cleanup;
     /* Initialize the resampler to be able to convert audio sample formats. */
     if (init_resampler(input_codec_context, output_codec_context,
-                       &resample_context))
+        &resample_context))
         goto cleanup;
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
     if (init_fifo(&fifo, output_codec_context))
